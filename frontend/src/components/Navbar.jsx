@@ -57,6 +57,18 @@ const Navbar = () => {
         <div>
           {isLoggedIn ? (
             <>
+            <Button
+                style={{
+                  ...button,
+                  backgroundColor: "#007BFF",
+                  color: "#FFFFFF",
+                }}
+                to="/home"
+                component={Link}
+                variant="contained"
+              >
+                Home
+              </Button>
               <Button
                 style={{
                   ...button,
