@@ -49,7 +49,7 @@ const Roofs = {
         <coneGeometry args={[5, 4, 4]} />
         <meshStandardMaterial map={roofTexture} />
       </mesh>
-      
+
     );
   },
   Flat: () => {
@@ -363,25 +363,43 @@ const Home = () => {
   const [selectedHouse, setSelectedHouse] = useState(null);
   const [selectedBuilding, setSelectedBuilding] = useState(null);
   const [roofType, setRoofType] = useState(null);
-  const [bgColor, setBgColor] = useState("#111"); // Default to black
+  const [bgColor, setBgColor] = useState("linear-gradient(black, lightblue)");
+  const [isOuterSpace, setIsOuterSpace] = useState(false);
+  const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
 
   const toggleBackgroundColor = () => {
-    setBgColor((prevColor) => (prevColor === "#111" ? "#A7C7E7" : "#111"));
+    if (isOuterSpace) {
+      setIsOuterSpace(false);
+    }
+    setBgColor((prevColor) =>
+      prevColor === "linear-gradient(black, lightblue)"
+        ? "linear-gradient(lightblue, yellow)"
+        : "linear-gradient(black, lightblue)"
+    );
   };
+
+  const changeTheme = (theme) => {
+    if (theme === 'Outer Space') {
+      setIsOuterSpace(true);  // Activate Outer Space theme
+    } else {
+      setIsOuterSpace(false); // Reset to Default Background
+    }
+  };
+
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100vh" }}>
       {/* Control Panel */}
       <div style={{ position: "absolute", top: 20, left: 20, zIndex: 10 }}>
         <div style={{ display: "flex", gap: "10px" }}>
-          
+
           {/* Houses Button */}
           <div>
             <button
-              onClick={() => { 
+              onClick={() => {
                 setShowHouseOptions(!showHouseOptions);
                 setShowBuildingOptions(false);  // Close Buildings menu if open
-              }} 
+              }}
               style={buttonStyle}
             >
               Houses
@@ -404,10 +422,10 @@ const Home = () => {
           {/* Buildings Button */}
           <div>
             <button
-              onClick={() => { 
+              onClick={() => {
                 setShowBuildingOptions(!showBuildingOptions);
                 setShowHouseOptions(false); // Close Houses menu if open
-              }} 
+              }}
               style={buttonStyle}
             >
               Buildings
@@ -441,16 +459,34 @@ const Home = () => {
         )}
       </div>
 
-      {/* Floating Toggle Button */}
-      <button
-        onClick={toggleBackgroundColor}
-        style={floatButtonStyle}
-      >
-        Day / Night Mode
-      </button>
+      {isOuterSpace && (
+        <video
+          src="../assets/images/outerspace.mp4"
+          autoPlay
+          loop
+          muted
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            objectFit: "fill",
+            zIndex: -1,
+          }}
+        />
+      )}
 
       {/* 3D Canvas */}
-      <Canvas style={{ height: "100vh", background: bgColor }} camera={{ position: [10, 6, 10] }}>
+      <Canvas
+        style={{
+          background: isOuterSpace ? "transparent" : bgColor,
+          width: "100%",
+          height: "100%",
+          position: "absolute",
+          top: 0,
+          left: 0,
+        }}
+        camera={{ position: [0, 3, 13] }}
+      >
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 5, 5]} intensity={1.5} />
         <OrbitControls />
@@ -461,6 +497,51 @@ const Home = () => {
         {selectedHouse && React.createElement(HouseModels[selectedHouse], { roofType })}
         {selectedBuilding && React.createElement(BuildingModels[selectedBuilding])}
       </Canvas>
+
+      {/* Day / Night Mode Button */}
+      <button
+        onClick={toggleBackgroundColor}
+        style={floatButtonStyle}
+      >
+        Day / Night Mode
+      </button>
+
+      {/* Theme Button to Toggle the Menu */}
+<button
+  onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
+  style={{ ...floatButtonStyle, left: "1280px" }} // Correct way to merge styles
+>
+  Theme
+</button>
+
+{/* Theme Selection Menu */}
+{isThemeMenuOpen && (
+  <div
+    style={{
+      position: 'absolute',
+      top: '60px', // Adjusted to make space below the button
+      left: '1280px', // Align with the Theme button
+      background: "#1e1942",
+      padding: '10px',
+      borderRadius: '8px', // Optional: Adds rounded corners to the menu
+      color: 'white',
+      fontSize: '14px',
+    }}
+  >
+    <ul style={{ listStyle: 'none', padding: 0, margin: 0}}>
+      <li 
+        onClick={() => changeTheme('Outer Space')} 
+        style={{
+          cursor: 'pointer',
+        }}
+      >
+        Outer Space
+      </li>
+      {/* Default Background is no longer needed */}
+    </ul>
+  </div>
+)}
+
     </div>
   );
 };
@@ -498,7 +579,7 @@ const dropdownStyle = {
 const floatButtonStyle = {
   position: "absolute",
   top: "20px",
-  left: "1350px",
+  left: "1370px",
   background: "#1e1942",
   color: "white",
   border: "none",
