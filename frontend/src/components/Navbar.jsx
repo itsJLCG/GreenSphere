@@ -3,14 +3,17 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { Link } from "react-router-dom";
-import { IsLoggedInContext } from "../App";
-import greensphereLogo from "../assets/images/greenspherelogo.png"; // Import the logo
-import Logout from './Logout';
+import { Link, useLocation } from "react-router-dom";
+import { IsLoggedInContext, UserRoleContext } from "../App"; // Import UserRoleContext
+import greensphereLogo from "../assets/images/greenspherelogo.png";
+import Logout from "./Logout";
 
 const Navbar = () => {
   const isLoggedIn = useContext(IsLoggedInContext);
-  const button = {
+  const userRole = useContext(UserRoleContext); // Get user role
+  const location = useLocation(); // Get current route
+
+  const buttonStyle = {
     marginRight: "15px",
     fontSize: "1rem",
     fontWeight: "600",
@@ -57,37 +60,42 @@ const Navbar = () => {
         <div>
           {isLoggedIn ? (
             <>
-            <Button
-                style={{
-                  ...button,
-                  backgroundColor: "#007BFF",
-                  color: "#FFFFFF",
-                }}
-                to="/home"
-                component={Link}
-                variant="contained"
-              >
-                Home
-              </Button>
-              <Button
-                style={{
-                  ...button,
-                  backgroundColor: "#007BFF",
-                  color: "#FFFFFF",
-                }}
-                to="/feedback"
-                component={Link}
-                variant="contained"
-              >
-                Feedback
-              </Button>
+              {/* ✅ Show Home & Feedback only if NOT an admin */}
+              {userRole !== "admin" && (
+                <>
+                  <Button
+                    style={{
+                      ...buttonStyle,
+                      backgroundColor: "#007BFF",
+                      color: "#FFFFFF",
+                    }}
+                    to="/home"
+                    component={Link}
+                    variant="contained"
+                  >
+                    Home
+                  </Button>
+                  <Button
+                    style={{
+                      ...buttonStyle,
+                      backgroundColor: "#007BFF",
+                      color: "#FFFFFF",
+                    }}
+                    to="/feedback"
+                    component={Link}
+                    variant="contained"
+                  >
+                    Feedback
+                  </Button>
+                </>
+              )}
               <Logout />
             </>
           ) : (
             <>
               <Button
                 style={{
-                  ...button,
+                  ...buttonStyle,
                   backgroundColor: "#3333FF",
                   color: "#FFFFFF",
                 }}
@@ -99,7 +107,7 @@ const Navbar = () => {
               </Button>
               <Button
                 style={{
-                  ...button,
+                  ...buttonStyle,
                   backgroundColor: "#5555FF",
                   color: "#FFFFFF",
                 }}

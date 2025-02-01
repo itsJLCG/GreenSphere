@@ -12,12 +12,13 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { SetIsLoggedInContext } from "../App";
+import { SetIsLoggedInContext, SetUserRoleContext } from "../App"; // ✅ Import SetUserRoleContext
 import greensphereLogo from "../assets/images/greenspherelogo.png";
 import greensphereImage from "../assets/images/greensphereloginsignup.png";
 
 const Login = () => {
   const setIsLoggedIn = useContext(SetIsLoggedInContext);
+  const setUserRole = useContext(SetUserRoleContext); // ✅ Get setUserRole from context
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -25,31 +26,34 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const loginResponse = await axios.post(
-        "http://localhost:3001/login",
-        { email, password },
-        { withCredentials: true }
-      );
+        const loginResponse = await axios.post(
+            "http://localhost:3001/login",
+            { email, password },
+            { withCredentials: true }
+        );
 
-      if (loginResponse.data === "Success") {
-        toast.success("Login successful!", { position: "top-right", autoClose: 3000 });
-        const userResponse = await axios.get("http://localhost:3001/user", { withCredentials: true });
+        if (loginResponse.data.message === "Success") {
+            toast.success("Login successful!", { position: "top-right", autoClose: 3000 });
 
-        if (userResponse.data.user) {
-          setIsLoggedIn(true);
-          navigate("/home", { state: { user: userResponse.data.user } });
-        } else {
-          toast.error("Failed to retrieve user information.", { position: "top-right", autoClose: 3000 });
+            const userRole = loginResponse.data.role; // ✅ Get role from response
+            
+            setIsLoggedIn(true);
+            setUserRole(userRole); // ✅ Set role in context
+
+            if (userRole === "admin") {
+                navigate("/adminhome");
+            } else {
+                navigate("/home");
+            }
         }
-      }
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        toast.error("Login failed: User does not exist or incorrect credentials", { position: "top-right", autoClose: 3000 });
-      } else {
-        toast.error("An error occurred. Please try again later.", { position: "top-right", autoClose: 3000 });
-      }
+        if (error.response && error.response.status === 401) {
+            toast.error("Login failed: User does not exist or incorrect credentials", { position: "top-right", autoClose: 3000 });
+        } else {
+            toast.error("An error occurred. Please try again later.", { position: "top-right", autoClose: 3000 });
+        }
     }
-  };
+};
 
   return (
     <Grid

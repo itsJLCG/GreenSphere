@@ -43,7 +43,7 @@ app.post("/signup", async (req, res) => {
             return res.status(400).json({ message: "Email already exists" });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new UserModel({ name, email, password: hashedPassword });
+        const newUser = new UserModel({ name, email, password: hashedPassword, role: "user" });
         const savedUser = await newUser.save();
         res.status(201).json(savedUser);
     } catch (error) {
@@ -58,9 +58,9 @@ app.post("/login", async (req, res) => {
         if (user) {
             const passwordMatch = await bcrypt.compare(password, user.password);
             if (passwordMatch) {
-                req.session.user = { id: user._id, name: user.name, email: user.email };
+                req.session.user = { id: user._id, name: user.name, email: user.email, role: user.role };
                 console.log("Session user:", req.session.user); // Debugging log
-                res.json("Success");
+                res.json({ message: "Success", role: user.role });
             } else {
                 res.status(401).json("Password does not match!");
             }
@@ -122,3 +122,56 @@ app.get("/feedback", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// New route for fetching all users (for admin)
+app.get("/admin/users", async (req, res) => {
+    try {
+        if (req.session.user && req.session.user.role === "admin") {
+            const users = await UserModel.find();
+            res.status(200).json(users);
+        } else {
+            res.status(403).json("Access denied");
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// New route for fetching all feedback (for admin)
+app.get("/admin/feedback", async (req, res) => {
+    try {
+        if (req.session.user && req.session.user.role === "admin") {
+            const feedbacks = await FeedbackModel.find();
+            res.status(200).json(feedbacks);
+        } else {
+            res.status(403).json("Access denied");
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.put('/admin/users/:userId', async (req, res) => {
+    const { userId } = req.params;  // Get user ID from the URL params
+    const { role } = req.body;      // Get the new role from the request body
+  
+    try {
+      // Check if the user exists
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      // Update the user's role
+      user.role = role;
+  
+      // Save the updated user back to the database
+      await user.save();
+  
+      // Return the updated user
+      res.status(200).json({ message: "User role updated successfully", user });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "There was an error updating the role" });
+    }
+  });
