@@ -365,11 +365,19 @@ const Home = () => {
   const [roofType, setRoofType] = useState(null);
   const [bgColor, setBgColor] = useState("linear-gradient(black, lightblue)");
   const [isOuterSpace, setIsOuterSpace] = useState(false);
+  const [isForest, setIsForest] = useState(false);
+  const [isAncient, setIsAncient] = useState(false);
+  const [isUnderwater, setIsUnderwater] = useState(false);
+  const [isCyberpunk, setIsCyberpunk] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
 
   const toggleBackgroundColor = () => {
-    if (isOuterSpace) {
+    if (isOuterSpace || isAncient || isUnderwater || isCyberpunk || isForest) {
       setIsOuterSpace(false);
+      setIsAncient(false);
+      setIsUnderwater(false);
+      setIsCyberpunk(false);
+      setIsForest(false);
     }
     setBgColor((prevColor) =>
       prevColor === "linear-gradient(black, lightblue)"
@@ -379,13 +387,45 @@ const Home = () => {
   };
 
   const changeTheme = (theme) => {
-    if (theme === 'Outer Space') {
-      setIsOuterSpace(true);  // Activate Outer Space theme
+    if (theme === "Outer Space") {
+      setIsOuterSpace(true);
+      setIsAncient(false); // Disable Ancient theme
+      setIsUnderwater(false); // Disable Underwater theme
+      setIsCyberpunk(false);
+      setIsForest(false);
+    } else if (theme === "Ancient") {
+      setIsAncient(true);
+      setIsOuterSpace(false); // Disable Outer Space theme
+      setIsUnderwater(false); // Disable Underwater theme
+      setIsCyberpunk(false);
+      setIsForest(false);
+    } else if (theme === "Underwater") {
+      setIsAncient(false);
+      setIsOuterSpace(false); // Disable Outer Space theme
+      setIsUnderwater(true);
+      setIsCyberpunk(false);
+      setIsForest(false);
+    } else if (theme === "Cyberpunk") {
+      setIsAncient(false);
+      setIsOuterSpace(false); // Disable Outer Space theme
+      setIsUnderwater(false);
+      setIsCyberpunk(true);
+      setIsForest(false);
+    } else if (theme === "Forest") {
+      setIsAncient(false);
+      setIsOuterSpace(false); // Disable Outer Space theme
+      setIsUnderwater(false);
+      setIsCyberpunk(false);
+      setIsForest(true);
     } else {
-      setIsOuterSpace(false); // Reset to Default Background
+      setIsOuterSpace(false);
+      setIsAncient(false);
+      setIsUnderwater(false);
+      setIsCyberpunk(false);
+      setIsForest(false);
+      setBgColor("linear-gradient(black, lightblue)"); // Reset background
     }
   };
-
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100vh" }}>
@@ -475,18 +515,84 @@ const Home = () => {
         />
       )}
 
+      {isAncient && (
+        <video
+          src="../assets/images/ancient.mp4"
+          autoPlay
+          loop
+          muted
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            objectFit: "fill",
+            zIndex: -1,
+          }}
+        />
+      )}
+
+      {isUnderwater && (
+        <video
+          src="../assets/images/underwater.mp4"
+          autoPlay
+          loop
+          muted
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            objectFit: "fill",
+            zIndex: -1,
+          }}
+        />
+      )}
+
+      {isCyberpunk && (
+        <video
+          src="../assets/images/cyberpunk.mp4"
+          autoPlay
+          loop
+          muted
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            objectFit: "fill",
+            zIndex: -1,
+          }}
+        />
+      )}
+
+      {isForest && (
+        <video
+          src="../assets/images/forest.mp4"
+          autoPlay
+          loop
+          muted
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            objectFit: "fill",
+            zIndex: -1,
+          }}
+        />
+      )}
+
       {/* 3D Canvas */}
       <Canvas
         style={{
-          background: isOuterSpace ? "transparent" : bgColor,
+          background: isOuterSpace || isAncient || isUnderwater || isCyberpunk || isForest ? "transparent" : bgColor,
           width: "100%",
           height: "100%",
           position: "absolute",
           top: 0,
           left: 0,
         }}
-        camera={{ position: [0, 3, 13] }}
+        camera={{ position: [0, 0, 11] }}
       >
+
+
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 5, 5]} intensity={1.5} />
         <OrbitControls />
@@ -507,40 +613,84 @@ const Home = () => {
       </button>
 
       {/* Theme Button to Toggle the Menu */}
-<button
-  onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
-  style={{ ...floatButtonStyle, left: "1280px" }} // Correct way to merge styles
->
-  Theme
-</button>
-
-{/* Theme Selection Menu */}
-{isThemeMenuOpen && (
-  <div
-    style={{
-      position: 'absolute',
-      top: '60px', // Adjusted to make space below the button
-      left: '1280px', // Align with the Theme button
-      background: "#1e1942",
-      padding: '10px',
-      borderRadius: '8px', // Optional: Adds rounded corners to the menu
-      color: 'white',
-      fontSize: '14px',
-    }}
-  >
-    <ul style={{ listStyle: 'none', padding: 0, margin: 0}}>
-      <li 
-        onClick={() => changeTheme('Outer Space')} 
-        style={{
-          cursor: 'pointer',
-        }}
+      <button
+        onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
+        style={{ ...floatButtonStyle, left: "1280px" }} // Correct way to merge styles
       >
-        Outer Space
-      </li>
-      {/* Default Background is no longer needed */}
-    </ul>
-  </div>
-)}
+        Theme
+      </button>
+
+      {/* Theme Selection Menu */}
+      {isThemeMenuOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '60px', // Adjusted to make space below the button
+            left: '1280px', // Align with the Theme button
+            background: "#1e1942",
+            padding: '10px',
+            borderRadius: '8px', // Optional: Adds rounded corners to the menu
+            color: 'white',
+            fontSize: '14px',
+          }}
+        >
+          <ul style={{ listStyle: 'none', padding: 5, margin: 0 }}>
+            <li
+              onClick={() => changeTheme('Outer Space')}
+              style={{
+                cursor: 'pointer',
+              }}
+            >
+              Outer Space
+            </li>
+            {/* Default Background is no longer needed */}
+          </ul>
+          <ul style={{ listStyle: 'none', padding: 5, margin: 0 }}>
+            <li
+              onClick={() => changeTheme('Forest')}
+              style={{
+                cursor: 'pointer',
+              }}
+            >
+              Forest
+            </li>
+            {/* Default Background is no longer needed */}
+          </ul>
+          <ul style={{ listStyle: 'none', padding: 5, margin: 0 }}>
+            <li
+              onClick={() => changeTheme('Ancient')}
+              style={{
+                cursor: 'pointer',
+              }}
+            >
+              Ancient Realm
+            </li>
+            {/* Default Background is no longer needed */}
+          </ul>
+          <ul style={{ listStyle: 'none', padding: 5, margin: 0 }}>
+            <li
+              onClick={() => changeTheme('Underwater')}
+              style={{
+                cursor: 'pointer',
+              }}
+            >
+              Underwater
+            </li>
+            {/* Default Background is no longer needed */}
+          </ul>
+          <ul style={{ listStyle: 'none', padding: 5, margin: 0 }}>
+            <li
+              onClick={() => changeTheme('Cyberpunk')}
+              style={{
+                cursor: 'pointer',
+              }}
+            >
+              Cyberpunk
+            </li>
+            {/* Default Background is no longer needed */}
+          </ul>
+        </div>
+      )}
 
     </div>
   );
