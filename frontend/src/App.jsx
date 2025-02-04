@@ -9,6 +9,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import AdminHome from './components/admin/AdminHome';
+import LandingPage from './components/LandingPage';
 
 export const IsLoggedInContext = createContext();
 export const SetIsLoggedInContext = createContext();
@@ -52,6 +53,7 @@ function App() {
                                 <BrowserRouter>
                                     <Navbar />
                                     <Routes>
+                                        <Route path="/" element={isLoggedIn ? <Navigate to={userRole === 'admin' ? "/adminhome" : "/home"} /> : <LandingPage />} />
                                         <Route path="/signup" element={isLoggedIn ? <Navigate to={userRole === 'admin' ? "/adminhome" : "/home"} /> : <Signup />} />
                                         <Route path="/login" element={isLoggedIn ? <Navigate to={userRole === 'admin' ? "/adminhome" : "/home"} /> : <Login />} />
                                         <Route path="/home" element={isLoggedIn ? <Home /> : <Navigate to="/login" />} />
