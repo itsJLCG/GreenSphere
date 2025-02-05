@@ -2,24 +2,22 @@ import React, { useState, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stats, useTexture, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import SolarPanel from "./renewableModel/SolarPanel.jsx";
+import CottagesHouse from "./houseModel/Cottages.jsx";
+import TownHouse from "./houseModel/Townhouse.jsx";
+import MobileHome from "./houseModel/MobileHome.jsx";
+import ApartmentsBuilding from "./buildingModel/Apartments.jsx";
+import OfficeBuilding from "./buildingModel/OfficeBuilding.jsx";
 
 const Platform = () => {
   const texture = useTexture("../assets/images/grass.webp");
   const { scene } = useGLTF("../assets/models/Trees.glb");
-
   const trees = useMemo(() => Array.from({ length: 9 }, () => scene.clone()), [scene]);
-
-  const treeDetails = [
-    { position: [-8, -1, -8], scale: 2 },
-    { position: [8, -1, -8], scale: 2.1 },
-    { position: [6, -1, -6], scale: 2 },
-    { position: [-6.5, -1, -6], scale: 2.2 },
-    { position: [4, -1, -8], scale: 2.3 },
-    { position: [2, -1, -7], scale: 1.7 },
-    { position: [1, -1, -8], scale: 2.2 },
-    { position: [-1.5, -1, -7], scale: 2.4 },
-    { position: [-4, -1, -8], scale: 1.8 }
+  const treePositions = [
+    [-8, -1, -8], [8, -1, -8], [6, -1, -6], [-6.5, -1, -6], [4, -1, -8],
+    [2, -1, -7], [1, -1, -8], [-1.5, -1, -7], [-4, -1, -8]
   ];
+  const treeScales = [2, 2.1, 2, 2.2, 2.3, 1.7, 2.2, 2.4, 1.8];
 
   return (
     <>
@@ -27,96 +25,75 @@ const Platform = () => {
         <planeGeometry args={[20, 20]} />
         <meshStandardMaterial map={texture} />
       </mesh>
-
-      {treeDetails.map((tree, index) => (
-        <primitive
-          key={index}
-          object={trees[index]}
-          position={tree.position}
-          scale={tree.scale}
-        />
+      {treePositions.map((position, index) => (
+        <primitive key={index} object={trees[index]} position={position} scale={treeScales[index]} />
       ))}
     </>
   );
 };
 
-
 const Roofs = {
   Gable: ({ texturePath }) => {
-    const roofTexture = useTexture(texturePath); // Dynamically use texture path
+    const roofTexture = useTexture(texturePath);
     return (
-      <mesh position={[0, 7, 0]} rotation={[0, Math.PI / 4, 0]}>
-        <coneGeometry args={[5, 4, 4]} />
-        <meshStandardMaterial map={roofTexture} />
-      </mesh>
-
+      <group>
+        <mesh position={[0, 7, 0]} rotation={[0, Math.PI / 4, 0]}>
+          <coneGeometry args={[5, 4, 4]} />
+          <meshStandardMaterial map={roofTexture} />
+        </mesh>
+      </group>
     );
   },
   Flat: () => {
-    const roofTexture = useTexture('../assets/images/roof.jpg');
+    const roofTexture = useTexture("../assets/images/roof.jpg");
     return (
-      <mesh position={[0, 5.5, 0]}>
-        <boxGeometry args={[6, 1, 6]} />
-        <meshStandardMaterial map={roofTexture} />
-      </mesh>
+      <group>
+        <mesh position={[0, 5.5, 0]}>
+          <boxGeometry args={[6, 1, 6]} />
+          <meshStandardMaterial map={roofTexture} />
+        </mesh>
+        <SolarPanel position={[0, 6.2, 0]} rotation={[Math.PI / 2, 0, 0]} />
+      </group>
     );
   },
   Shed: () => {
-    const roofTexture = useTexture('../assets/images/roof.jpg');
+    const roofTexture = useTexture("../assets/images/roof.jpg");
     return (
-      <mesh position={[0, 6, 0]} rotation={[Math.PI / 20, 0, 0]}>
-        <boxGeometry args={[6, 1, 6]} />
-        <meshStandardMaterial map={roofTexture} />
-      </mesh>
+      <group>
+        <mesh position={[0, 6, 0]} rotation={[Math.PI / 20, 0, 0]}>
+          <boxGeometry args={[6, 1, 6]} />
+          <meshStandardMaterial map={roofTexture} />
+        </mesh>
+        <SolarPanel position={[0, 7, 1.5]} rotation={[Math.PI / 6, 0, 0]} />
+      </group>
     );
   },
   Butterfly: () => {
-    const roofTexture = useTexture('../assets/images/roof.jpg');
+    const roofTexture = useTexture("../assets/images/roof.jpg");
     return (
-      <group position={[-0.75, 5.30, 0]} rotation={[0, 4.75, 0]}>
-        {/* Left side of the V-shaped roof */}
+      <group position={[-0.75, 5.3, 0]} rotation={[0, 4.75, 0]}>
         <mesh position={[0, 0, 1]} rotation={[Math.PI / 3, 0, 0]}>
           <boxGeometry args={[5.85, 3.25]} />
           <meshStandardMaterial map={roofTexture} />
         </mesh>
-        {/* Right side of the V-shaped roof */}
         <mesh position={[0, 0, -1]} rotation={[-Math.PI / 2.75, 0, 0]}>
           <boxGeometry args={[5.85, 6.25]} />
           <meshStandardMaterial map={roofTexture} />
         </mesh>
+        <SolarPanel position={[0, 7, 0]} rotation={[Math.PI / 4, 0, 0]} />
       </group>
     );
   },
 };
 
 // Window component
-const Window = ({ position }) => {
+export const Window = ({ position }) => {
   const windowTexture = useTexture("../assets/images/window.webp"); // ✅ Fixed syntax
 
   return (
     <mesh position={position}>
       <boxGeometry args={[0.85, 1.5, 0.1]} /> {/* Window size remains the same */}
       <meshStandardMaterial map={windowTexture} /> {/* ✅ Apply texture */}
-    </mesh>
-  );
-};
-const WindowCottage = ({ position }) => {
-  const WindowCottage = useTexture("../assets/images/windowcottage.jpg"); // ✅ Fixed syntax
-
-  return (
-    <mesh position={position}>
-      <boxGeometry args={[0.85, 1.5, 0.1]} /> {/* Window size remains the same */}
-      <meshStandardMaterial map={WindowCottage} /> {/* ✅ Apply texture */}
-    </mesh>
-  );
-};
-const WindowMobile = ({ position }) => {
-  const WindowCottage = useTexture("../assets/images/mobilewindow.jpg"); // ✅ Fixed syntax
-
-  return (
-    <mesh position={position}>
-      <boxGeometry args={[0.85, 1.5, 0.1]} /> {/* Window size remains the same */}
-      <meshStandardMaterial map={WindowCottage} /> {/* ✅ Apply texture */}
     </mesh>
   );
 };
@@ -132,219 +109,19 @@ const SingleFamilyHouse = ({ roofType }) => {
         <boxGeometry args={[6, 6, 6]} />
         <meshStandardMaterial map={wallTexture} />
       </mesh>
-
       {/* Door */}
       <mesh position={[0, 0.5, 3.01]}>
         <boxGeometry args={[2, 3, 0.1]} />
         <meshStandardMaterial map={doorTexture} />
       </mesh>
-
       {/* Windows */}
       <Window position={[-2.5, 3, 3.01]} />
       <Window position={[2.5, 3, 3.01]} />
-
       {/* Roof */}
       {roofType && React.createElement(Roofs[roofType], { texturePath: '../assets/images/roof.jpg' })}
     </group>
   );
 };
-
-const CottagesHouse = () => {
-  const wallTexture = useTexture("../assets/images/cottagewall.webp");
-  const doorTexture = useTexture("../assets/images/cottagedoor.jpg");
-
-  return (
-    <group position={[0, 0, 0]}>
-      {/* Base */}
-      <mesh position={[0, 2, 0]}>
-        <boxGeometry args={[6, 6, 6]} />
-        <meshStandardMaterial map={wallTexture} />
-      </mesh>
-
-      {/* Door */}
-      <mesh position={[0, 0.5, 3.01]}>
-        <boxGeometry args={[2, 3, 0.1]} />
-        <meshStandardMaterial map={doorTexture} />
-      </mesh>
-
-      {/* Windows */}
-      <WindowCottage position={[-2.5, 3, 3.01]} />
-      <WindowCottage position={[2.5, 3, 3.01]} />
-
-      {/* Automatically applying the Gable roof with custom texture */}
-      <Roofs.Gable texturePath="../assets/images/cottageroof.jpg" />
-    </group>
-  );
-};
-
-const TownHouse = () => {
-  const townTexture1 = useTexture("../assets/images/townwall1.jpg");
-  const townTexture2 = useTexture("../assets/images/townwall2.jpg");
-  const doorTexture = useTexture("../assets/images/door.jpg");
-  const roofTexture = useTexture("../assets/images/townhouseroof.jpg");
-
-  return (
-    <group position={[0, 1, 0]}>
-      {/* Base */}
-      <mesh position={[0, 1.75, 0]}>
-        <boxGeometry args={[5, 7.5, 6]} />
-        <meshStandardMaterial map={townTexture2} />
-      </mesh>
-      <mesh position={[5, 2, 0]}>
-        <boxGeometry args={[5, 8, 6]} />
-        <meshStandardMaterial map={townTexture1} />
-      </mesh>
-      <mesh position={[-5, 2, 0]}>
-        <boxGeometry args={[5, 8, 6]} />
-        <meshStandardMaterial map={townTexture1} />
-      </mesh>
-
-      {/* Door */}
-      <mesh position={[0, -0.5, 3.01]}>
-        <boxGeometry args={[2, 3, 0.1]} />
-        <meshStandardMaterial map={doorTexture} />
-      </mesh>
-      <mesh position={[5, -0.5, 3.01]}>
-        <boxGeometry args={[2, 3, 0.1]} />
-        <meshStandardMaterial map={doorTexture} />
-      </mesh>
-      <mesh position={[-5, -0.5, 3.01]}>
-        <boxGeometry args={[2, 3, 0.1]} />
-        <meshStandardMaterial map={doorTexture} />
-      </mesh>
-
-      {/* Windows */}
-      <Window position={[-1.5, 3.5, 3.01]} />
-      <Window position={[1.5, 3.5, 3.01]} />
-
-      <Window position={[6.5, 3.5, 3.01]} />
-      <Window position={[-6.5, 3.5, 3.01]} />
-
-      <Window position={[3.5, 3.5, 3.01]} />
-      <Window position={[-3.5, 3.5, 3.01]} />
-
-      {/* Roof */}
-      <mesh position={[0, 7, 0]} rotation={[0, Math.PI / 4, 0]}>
-        <coneGeometry args={[5, 4, 4]} />
-        <meshStandardMaterial map={roofTexture} />
-      </mesh>
-      <mesh position={[5, 8, 0]} rotation={[0, Math.PI / 4, 0]}>
-        <coneGeometry args={[5, 4, 4]} />
-        <meshStandardMaterial map={roofTexture} />
-      </mesh>
-      <mesh position={[-5, 8, 0]} rotation={[0, Math.PI / 4, 0]}>
-        <coneGeometry args={[5, 4, 4]} />
-        <meshStandardMaterial map={roofTexture} />
-      </mesh>
-    </group>
-  );
-};
-
-
-const MobileHome = () => {
-  const wallTexture = useTexture("../assets/images/mobilewall.jpg"); // Adjusted texture path
-  const doorTexture = useTexture("../assets/images/mobiledoor.jpg"); // Adjusted texture path
-  const wheelTexture = useTexture("../assets/images/wheel.jpg"); // Adjusted texture path for wheels
-
-  return (
-    <group position={[0, 0, 0]}>
-      {/* Base */}
-      <mesh position={[0, 2, 0]}>
-        <boxGeometry args={[10, 4, 5]} /> {/* Adjusted size to be more typical for a mobile home */}
-        <meshStandardMaterial map={wallTexture} />
-      </mesh>
-
-      {/* Door */}
-      <mesh position={[0, 1.5, 2.6]}>
-        <boxGeometry args={[3, 2.5, 0.1]} /> {/* Wider and lower door typical for mobile homes */}
-        <meshStandardMaterial map={doorTexture} />
-      </mesh>
-
-      {/* Windows */}
-      <WindowMobile position={[-3, 2, 2.6]} /> {/* Larger windows for mobile home */}
-      <WindowMobile position={[3, 2, 2.6]} />
-
-      {/* Flat roof for the mobile home */}
-      <mesh position={[0, 4, 0]} rotation={[0, 0, 0]}>
-        <boxGeometry args={[10.75, 1, 5.75]} /> {/* Flat roof larger than base with overhang */}
-        <meshStandardMaterial map={useTexture("../assets/images/mobileroof.jpg")} />
-      </mesh>
-
-      {/* Wheels */}
-      {/* Front left wheel */}
-      <mesh position={[-4, 0, 2.5]} rotation={[-Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[1, 1, 0.5, 32]} /> {/* Wheel geometry */}
-        <meshStandardMaterial map={wheelTexture} />
-      </mesh>
-
-      {/* Front right wheel */}
-      <mesh position={[4, 0, 2.5]} rotation={[-Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[1, 1, 0.5, 32]} /> {/* Wheel geometry */}
-        <meshStandardMaterial map={wheelTexture} />
-      </mesh>
-
-      {/* Back left wheel */}
-      <mesh position={[-4, 0, -2.5]} rotation={[-Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[1, 1, 0.5, 32]} /> {/* Wheel geometry */}
-        <meshStandardMaterial map={wheelTexture} />
-      </mesh>
-
-      {/* Back right wheel */}
-      <mesh position={[4, 0, -2.5]} rotation={[-Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[1, 1, 0.5, 32]} /> {/* Wheel geometry */}
-        <meshStandardMaterial map={wheelTexture} />
-      </mesh>
-    </group>
-  );
-};
-
-const ApartmentsBuilding = () => {
-  const wallTexture = useTexture("../assets/images/apartmentwall.avif");
-  const roofTexture = useTexture("../assets/images/apartmentroof.webp");
-
-  return (
-    <group position={[0, 1.5, 0]}>
-      {/* Floors (Stacked boxes to form a tall apartment) */}
-      {[...Array(4)].map((_, i) => (
-        <mesh key={i} position={[0, i * 5, 0]}>
-          <boxGeometry args={[12, 5, 8]} /> {/* Wider and taller structure */}
-          <meshStandardMaterial map={wallTexture} />
-        </mesh>
-      ))}
-
-      {/* Roof */}
-      <mesh position={[0, 17.75, 0]}>
-        <boxGeometry args={[12, 0.5, 8.5]} /> {/* Flat roof with a slight overhang */}
-        <meshStandardMaterial map={roofTexture} />
-      </mesh>
-    </group>
-  );
-};
-
-
-const OfficeBuilding = () => {
-  const wallTexture = useTexture("../assets/images/officewall.jpg");
-  const roofTexture = useTexture("../assets/images/officeroof.jpg");
-
-  return (
-    <group position={[0, 1.5, 0]}>
-      {/* Floors (Stacked boxes to form a tall apartment) */}
-      {[...Array(4)].map((_, i) => (
-        <mesh key={i} position={[0, i * 5, 0]}>
-          <boxGeometry args={[12, 5, 8]} /> {/* Wider and taller structure */}
-          <meshStandardMaterial map={wallTexture} />
-        </mesh>
-      ))}
-
-      {/* Roof */}
-      <mesh position={[0, 17.75, 0]}>
-        <boxGeometry args={[12, 0.5, 8.5]} /> {/* Flat roof with a slight overhang */}
-        <meshStandardMaterial map={roofTexture} />
-      </mesh>
-    </group>
-  );
-};
-
 
 const HouseModels = {
   "Single-Family": SingleFamilyHouse,
@@ -370,61 +147,22 @@ const Home = () => {
   const [isUnderwater, setIsUnderwater] = useState(false);
   const [isCyberpunk, setIsCyberpunk] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
+  const [showSolarPanel, setShowSolarPanel] = useState(false);
 
   const toggleBackgroundColor = () => {
     if (isOuterSpace || isAncient || isUnderwater || isCyberpunk || isForest) {
-      setIsOuterSpace(false);
-      setIsAncient(false);
-      setIsUnderwater(false);
-      setIsCyberpunk(false);
-      setIsForest(false);
+      setIsOuterSpace(false); setIsAncient(false); setIsUnderwater(false); setIsCyberpunk(false); setIsForest(false);
     }
-    setBgColor((prevColor) =>
-      prevColor === "linear-gradient(black, lightblue)"
-        ? "linear-gradient(lightblue, yellow)"
-        : "linear-gradient(black, lightblue)"
-    );
+    setBgColor((prevColor) => prevColor === "linear-gradient(black, lightblue)" ? "linear-gradient(lightblue, yellow)" : "linear-gradient(black, lightblue)");
   };
 
   const changeTheme = (theme) => {
-    if (theme === "Outer Space") {
-      setIsOuterSpace(true);
-      setIsAncient(false); // Disable Ancient theme
-      setIsUnderwater(false); // Disable Underwater theme
-      setIsCyberpunk(false);
-      setIsForest(false);
-    } else if (theme === "Ancient") {
-      setIsAncient(true);
-      setIsOuterSpace(false); // Disable Outer Space theme
-      setIsUnderwater(false); // Disable Underwater theme
-      setIsCyberpunk(false);
-      setIsForest(false);
-    } else if (theme === "Underwater") {
-      setIsAncient(false);
-      setIsOuterSpace(false); // Disable Outer Space theme
-      setIsUnderwater(true);
-      setIsCyberpunk(false);
-      setIsForest(false);
-    } else if (theme === "Cyberpunk") {
-      setIsAncient(false);
-      setIsOuterSpace(false); // Disable Outer Space theme
-      setIsUnderwater(false);
-      setIsCyberpunk(true);
-      setIsForest(false);
-    } else if (theme === "Forest") {
-      setIsAncient(false);
-      setIsOuterSpace(false); // Disable Outer Space theme
-      setIsUnderwater(false);
-      setIsCyberpunk(false);
-      setIsForest(true);
-    } else {
-      setIsOuterSpace(false);
-      setIsAncient(false);
-      setIsUnderwater(false);
-      setIsCyberpunk(false);
-      setIsForest(false);
-      setBgColor("linear-gradient(black, lightblue)"); // Reset background
-    }
+    setIsOuterSpace(false); setIsAncient(false); setIsUnderwater(false); setIsCyberpunk(false); setIsForest(false);
+    if (theme === "Outer Space") setIsOuterSpace(true);
+    if (theme === "Ancient") setIsAncient(true);
+    if (theme === "Underwater") setIsUnderwater(true);
+    if (theme === "Cyberpunk") setIsCyberpunk(true);
+    if (theme === "Forest") setIsForest(true);
   };
 
   return (
@@ -432,58 +170,38 @@ const Home = () => {
       {/* Control Panel */}
       <div style={{ position: "absolute", top: 20, left: 20, zIndex: 10 }}>
         <div style={{ display: "flex", gap: "10px" }}>
-
-          {/* Houses Button */}
-          <div>
-            <button
-              onClick={() => {
-                setShowHouseOptions(!showHouseOptions);
-                setShowBuildingOptions(false);  // Close Buildings menu if open
-              }}
-              style={buttonStyle}
-            >
-              Houses
-            </button>
-            {showHouseOptions && (
-              <div style={dropdownStyle}>
-                {Object.keys(HouseModels).map((house) => (
-                  <button
-                    key={house}
-                    onClick={() => { setSelectedHouse(house); setSelectedBuilding(null); setRoofType(null); }}
-                    style={buttonStyle}
-                  >
-                    {house}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Buildings Button */}
-          <div>
-            <button
-              onClick={() => {
-                setShowBuildingOptions(!showBuildingOptions);
-                setShowHouseOptions(false); // Close Houses menu if open
-              }}
-              style={buttonStyle}
-            >
-              Buildings
-            </button>
-            {showBuildingOptions && (
-              <div style={dropdownStyle}>
-                {Object.keys(BuildingModels).map((building) => (
-                  <button
-                    key={building}
-                    onClick={() => { setSelectedBuilding(building); setSelectedHouse(null); }}
-                    style={buttonStyle}
-                  >
-                    {building}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          {[
+            { label: 'Houses', options: HouseModels, setShow: setShowHouseOptions, showOptions: showHouseOptions, setSelection: setSelectedHouse },
+            { label: 'Buildings', options: BuildingModels, setShow: setShowBuildingOptions, showOptions: showBuildingOptions, setSelection: setSelectedBuilding }
+          ].map(({ label, options, setShow, showOptions, setSelection }) => (
+            <div key={label}>
+              <button
+                onClick={() => {
+                  setShow(!showOptions);
+                  label === 'Houses' ? setShowBuildingOptions(false) : setShowHouseOptions(false); // Close the other menu if open
+                }}
+                style={buttonStyle}
+              >
+                {label}
+              </button>
+              {showOptions && (
+                <div style={dropdownStyle}>
+                  {Object.keys(options).map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => {
+                        setSelection(option);
+                        label === 'Houses' ? setSelectedBuilding(null) : setSelectedHouse(null); // Reset the other selection
+                      }}
+                      style={buttonStyle}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
 
         {/* Roof Selection - Only show if Single-Family house is selected */}
@@ -497,75 +215,33 @@ const Home = () => {
             ))}
           </div>
         )}
+
+        {/* Show Solar Panel Button if Any House is Selected */}
+        {roofType && (
+          <div style={{ marginTop: 20 }}>
+            <button
+              onClick={() => setShowSolarPanel(!showSolarPanel)}
+              style={buttonStyle}
+            >
+              {showSolarPanel ? "Remove Solar Panel" : "Add Solar Panel"}
+            </button>
+          </div>
+        )}
       </div>
 
-      {isOuterSpace && (
+      {(isOuterSpace || isAncient || isUnderwater || isCyberpunk || isForest) && (
         <video
-          src="../assets/images/outerspace.mp4"
-          autoPlay
-          loop
-          muted
-          style={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            objectFit: "fill",
-            zIndex: -1,
-          }}
-        />
-      )}
-
-      {isAncient && (
-        <video
-          src="../assets/images/ancient.mp4"
-          autoPlay
-          loop
-          muted
-          style={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            objectFit: "fill",
-            zIndex: -1,
-          }}
-        />
-      )}
-
-      {isUnderwater && (
-        <video
-          src="../assets/images/underwater.mp4"
-          autoPlay
-          loop
-          muted
-          style={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            objectFit: "fill",
-            zIndex: -1,
-          }}
-        />
-      )}
-
-      {isCyberpunk && (
-        <video
-          src="../assets/images/cyberpunk.mp4"
-          autoPlay
-          loop
-          muted
-          style={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            objectFit: "fill",
-            zIndex: -1,
-          }}
-        />
-      )}
-
-      {isForest && (
-        <video
-          src="../assets/images/forest.mp4"
+          src={
+            isOuterSpace
+              ? "../assets/images/outerspace.mp4"
+              : isAncient
+                ? "../assets/images/ancient.mp4"
+                : isUnderwater
+                  ? "../assets/images/underwater.mp4"
+                  : isCyberpunk
+                    ? "../assets/images/cyberpunk.mp4"
+                    : "../assets/images/forest.mp4"
+          }
           autoPlay
           loop
           muted
@@ -591,8 +267,6 @@ const Home = () => {
         }}
         camera={{ position: [0, 0, 11] }}
       >
-
-
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 5, 5]} intensity={1.5} />
         <OrbitControls />
@@ -625,117 +299,35 @@ const Home = () => {
         <div
           style={{
             position: 'absolute',
-            top: '60px', // Adjusted to make space below the button
-            left: '1280px', // Align with the Theme button
+            top: '60px',
+            left: '1280px',
             background: "#1e1942",
             padding: '10px',
-            borderRadius: '8px', // Optional: Adds rounded corners to the menu
+            borderRadius: '8px',
             color: 'white',
             fontSize: '14px',
           }}
         >
-          <ul style={{ listStyle: 'none', padding: 5, margin: 0 }}>
-            <li
-              onClick={() => changeTheme('Outer Space')}
-              style={{
-                cursor: 'pointer',
-              }}
-            >
-              Outer Space
-            </li>
-            {/* Default Background is no longer needed */}
-          </ul>
-          <ul style={{ listStyle: 'none', padding: 5, margin: 0 }}>
-            <li
-              onClick={() => changeTheme('Forest')}
-              style={{
-                cursor: 'pointer',
-              }}
-            >
-              Forest
-            </li>
-            {/* Default Background is no longer needed */}
-          </ul>
-          <ul style={{ listStyle: 'none', padding: 5, margin: 0 }}>
-            <li
-              onClick={() => changeTheme('Ancient')}
-              style={{
-                cursor: 'pointer',
-              }}
-            >
-              Ancient Realm
-            </li>
-            {/* Default Background is no longer needed */}
-          </ul>
-          <ul style={{ listStyle: 'none', padding: 5, margin: 0 }}>
-            <li
-              onClick={() => changeTheme('Underwater')}
-              style={{
-                cursor: 'pointer',
-              }}
-            >
-              Underwater
-            </li>
-            {/* Default Background is no longer needed */}
-          </ul>
-          <ul style={{ listStyle: 'none', padding: 5, margin: 0 }}>
-            <li
-              onClick={() => changeTheme('Cyberpunk')}
-              style={{
-                cursor: 'pointer',
-              }}
-            >
-              Cyberpunk
-            </li>
-            {/* Default Background is no longer needed */}
-          </ul>
+          {['Outer Space', 'Forest', 'Ancient', 'Underwater', 'Cyberpunk'].map((theme) => (
+            <ul key={theme} style={{ listStyle: 'none', padding: 5, margin: 0 }}>
+              <li
+                onClick={() => changeTheme(theme)}
+                style={{ cursor: 'pointer' }}
+              >
+                {theme}
+              </li>
+            </ul>
+          ))}
         </div>
       )}
+
 
     </div>
   );
 };
 
-const buttonStyle = {
-  background: "#1e1942",
-  color: "white",
-  padding: "10px 15px",
-  margin: "5px 0",
-  border: "none",
-  borderRadius: "5px",
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-  gap: "8px",
-  fontSize: "14px",
-  transition: "all 0.3s ease",
-  width: "160px",
-};
-
-const dropdownStyle = {
-  background: "#1e1942",
-  color: "white",
-  padding: "10px",
-  position: "absolute",
-  top: "50px",
-  left: "0",
-  zIndex: "9",
-  width: "160px",
-  borderRadius: "5px",
-  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.5)",
-};
-
-// Floating Button Style
-const floatButtonStyle = {
-  position: "absolute",
-  top: "20px",
-  left: "1370px",
-  background: "#1e1942",
-  color: "white",
-  border: "none",
-  cursor: "pointer",
-  zIndex: 20,
-  fontSize: "14px",
-};
+const buttonStyle = { background: "#1e1942", color: "white", padding: "10px 15px", margin: "5px 0", border: "none", borderRadius: "5px", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", transition: "all 0.3s ease", width: "160px" };
+const dropdownStyle = { background: "#1e1942", color: "white", padding: "10px", position: "absolute", top: "50px", left: "0", zIndex: "9", width: "160px", borderRadius: "5px", boxShadow: "0 4px 6px rgba(0, 0, 0, 0.5)" };
+const floatButtonStyle = { position: "absolute", top: "20px", left: "1370px", background: "#1e1942", color: "white", border: "none", cursor: "pointer", zIndex: 20, fontSize: "14px" };
 
 export default Home;
