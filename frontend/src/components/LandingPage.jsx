@@ -1,54 +1,37 @@
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Stats, useGLTF } from '@react-three/drei';
-import { Container, Typography, Box, Grid, Paper } from '@mui/material';
+import { OrbitControls, useGLTF } from '@react-three/drei';
+import { Box, Typography, Grid, Paper } from '@mui/material';
 
-// A component that handles the rotation animation
-const RotatingModel = ({ scene }) => {
-    const modelRef = useRef();
-  
-    // Rotate the model on every frame
-    useFrame(() => {
-      if (modelRef.current) {
-        modelRef.current.rotation.x += 0.01; // Rotate around the X-axis
-      }
-    });
-  
-    return (
-      <primitive 
-        object={scene} 
-        position={[0, 2, 0]} 
-        scale={[1, 1, 1]} 
-        ref={modelRef}
-      />
-    );
-  };
-  
-  // A component for rotating text
-  const RotatingText = ({ scene }) => {  // Fix: Use "scene" instead of "text"
-    const modelRef = useRef();
-  
-    // Rotate the text model
-    useFrame(() => {
-      if (modelRef.current) {
-        modelRef.current.rotation.y += 0.01; // Rotate around the X-axis
-      }
-    });
-  
-    return (
-      <primitive 
-        object={scene}  // Fix: Use the correct "scene" property
-        position={[0, -1, -3]} 
-        scale={[0.1, 0.1, 0.1]} 
-        ref={modelRef}
-      />
-    );
-  };
+const RotatingLogo = ({ scene, position, scale }) => {
+  const logoRef = useRef();
+
+  useFrame(() => {
+    if (logoRef.current) {
+      logoRef.current.rotation.x = Math.PI / 2; // Rotate 90 degrees
+    }
+  });
+
+  return <primitive ref={logoRef} object={scene} position={position} scale={scale} />;
+};
+
+const StaticModel = ({ scene, position, scale }) => {
+  return <primitive object={scene} position={position} scale={scale} />;
+};
+
+const Platform = () => {
+  return (
+    <mesh position={[0, -2.5, 0]}>
+      <cylinderGeometry args={[3, 3, 0.2, 32]} />
+      <meshStandardMaterial color="#649860" />
+    </mesh>
+  );
+};
 
 const LandingPage = () => {
-  // Load the .glb models
   const { scene: logoScene } = useGLTF('/assets/models/greenspherelogo.glb');
   const { scene: textScene } = useGLTF('/assets/models/greenspheretext.glb');
+  const { scene: textScenes } = useGLTF('/assets/models/fronttext.glb');
 
   return (
     <Box
@@ -56,27 +39,30 @@ const LandingPage = () => {
         position: 'relative',
         height: '100vh',
         width: '100%',
-        background: 'linear-gradient(135deg, #1e1942, #3a2d69)',
+        background: '#0e0a36',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden',
       }}
     >
-      {/* 3D Canvas */}
-      <Canvas style={{ height: '100vh', width: '100%' }}>
+      <Canvas style={{ height: '100vh', width: '100%' }} camera={{ position: [0, 0, 8] }}>
         <OrbitControls />
-        
+
         {/* Lighting */}
         <ambientLight intensity={1.5} />
         <directionalLight position={[2, 2, 2]} intensity={1} />
 
-        {/* Render the rotating models */}
-        <RotatingModel scene={logoScene} />  
-        <RotatingText scene={textScene} />  
+        {/* Platform */}
+        <Platform />
+
+        {/* Rotating Logo */}
+        <RotatingLogo scene={logoScene} position={[0, 1.7, 0.2]} scale={[1, 1, 1]} />
+        <StaticModel scene={textScene} position={[0, -1.1, 0]} scale={[0.1, 0.1, 0.1]} />
+        <StaticModel scene={textScenes} position={[0, 13, -5]} scale={[0.1, 0.1, 0.1]} />
       </Canvas>
 
-      {/* Developer Info (Glassmorphic Card) */}
+      {/* Developer Info */}
       <Paper
         elevation={6}
         sx={{
@@ -103,6 +89,27 @@ const LandingPage = () => {
           ))}
         </Grid>
       </Paper>
+
+      <Paper
+        elevation={6}
+        sx={{
+          position: 'absolute',  // Position the paper element
+          top: 50,  // Adjust this value to the height of your header
+          padding: '20px 30px',
+          borderRadius: '12px',
+          backdropFilter: 'blur(10px)',
+          background: 'rgba(255, 255, 255, 0.1)',
+          color: '#fff',
+          textAlign: 'center',
+          width: 'auto',
+          left:  'auto',
+        }}
+      >
+        <Typography sx={{ fontSize: '1.8rem', fontWeight: 'bold', mb: 1 }}>
+          A simulator for designing and applying renewable energy solutions. Start building your greener future today!
+        </Typography>
+      </Paper>
+
     </Box>
   );
 };
