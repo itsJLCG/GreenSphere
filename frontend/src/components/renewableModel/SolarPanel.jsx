@@ -1,11 +1,12 @@
 import { useTexture } from "@react-three/drei";
-import React, { useState, useMemo } from "react";
+import React from "react";
 
 const SolarPanel = ({ position, rotation }) => {
-  const panelTexture = useTexture("../assets/images/solarpanel.jpg"); // Change texture as needed
+  const panelTexture = useTexture("../assets/images/solarpanel.jpg");
+
   return (
     <mesh position={position} rotation={rotation}>
-      <planeGeometry args={[1, 1]} />
+      <planeGeometry args={[2, 2]} /> {/* Matches the grid cell size */}
       <meshStandardMaterial map={panelTexture} />
     </mesh>
   );

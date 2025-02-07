@@ -1,6 +1,6 @@
 import { useTexture } from "@react-three/drei";
 import React, { useState, useMemo } from "react";
-import { Roofs } from "./SingleFamily";
+import { Roofs } from "./SingleFamilyHouse.jsx";
 
 const WindowCottage = ({ position }) => {
   const WindowCottage = useTexture("../assets/images/windowcottage.jpg"); // ✅ Fixed syntax

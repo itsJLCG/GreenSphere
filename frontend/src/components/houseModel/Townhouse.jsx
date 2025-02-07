@@ -1,6 +1,6 @@
 import { useTexture } from "@react-three/drei";
 import React, { useState, useMemo } from "react";
-import { Window } from "../Home";
+import { Window } from "./SingleFamilyHouse.jsx";
 
 const TownHouse = () => {
   const townTexture1 = useTexture("../assets/images/townwall1.jpg");
