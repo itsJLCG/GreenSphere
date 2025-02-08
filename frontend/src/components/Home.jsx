@@ -2,7 +2,6 @@ import React, { useState, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stats, useTexture, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-import SolarPanel from "./renewableModel/SolarPanel.jsx";
 import CottagesHouse from "./houseModel/Cottages.jsx";
 import TownHouse from "./houseModel/Townhouse.jsx";
 import MobileHome from "./houseModel/MobileHome.jsx";
@@ -10,6 +9,8 @@ import ApartmentsBuilding from "./buildingModel/Apartments.jsx";
 import OfficeBuilding from "./buildingModel/OfficeBuilding.jsx";
 import SingleFamilyHouse from "./houseModel/SingleFamilyHouse.jsx";
 import { Roofs } from "./houseModel/SingleFamilyHouse.jsx";
+import RenewableSlots from "./RenewableSlots.jsx";
+import { Html } from "@react-three/drei";
 
 const Platform = () => {
   const texture = useTexture("../assets/images/grass.webp");
@@ -58,7 +59,6 @@ const Home = () => {
   const [isUnderwater, setIsUnderwater] = useState(false);
   const [isCyberpunk, setIsCyberpunk] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
-  const [showSolarPanel, setShowSolarPanel] = useState(false);
 
   const toggleBackgroundColor = () => {
     if (isOuterSpace || isAncient || isUnderwater || isCyberpunk || isForest) {
@@ -126,18 +126,6 @@ const Home = () => {
             ))}
           </div>
         )}
-
-        {/* Show Solar Panel Button if Any House is Selected */}
-        {roofType && (
-          <div style={{ marginTop: 20 }}>
-            <button
-              onClick={() => setShowSolarPanel(!showSolarPanel)}
-              style={buttonStyle}
-            >
-              {showSolarPanel ? "Remove Solar Panel" : "Add Solar Panel"}
-            </button>
-          </div>
-        )}
       </div>
 
       {(isOuterSpace || isAncient || isUnderwater || isCyberpunk || isForest) && (
@@ -182,6 +170,11 @@ const Home = () => {
         <directionalLight position={[5, 5, 5]} intensity={1.5} />
         <OrbitControls />
         <Platform />
+        {(selectedHouse || selectedBuilding) && (
+          <Html position={[0, -3, 0]}>
+            <RenewableSlots />
+          </Html>
+        )}
         <Stats />
 
         {/* Render Houses or Buildings */}
@@ -230,9 +223,9 @@ const Home = () => {
             </ul>
           ))}
         </div>
+
+
       )}
-
-
     </div>
   );
 };
