@@ -63,62 +63,54 @@ const MobileRoofGrid = ({ onSelect, solarPanels, setSolarPanels }) => {
   );
 };
 
-const MobileHome = () => {
-  const wallTexture = useTexture("../assets/images/mobilewall.jpg"); // Adjusted texture path
-  const doorTexture = useTexture("../assets/images/mobiledoor.jpg"); // Adjusted texture path
-  const wheelTexture = useTexture("../assets/images/wheel.jpg"); // Adjusted texture path for wheels
+const MobileHome = ({ showSolarPanels }) => {
+  const wallTexture = useTexture("../assets/images/mobilewall.jpg");
+  const doorTexture = useTexture("../assets/images/mobiledoor.jpg");
+  const wheelTexture = useTexture("../assets/images/wheel.jpg");
   const [solarPanels, setSolarPanels] = useState([]);
 
   return (
     <group position={[0, 0, 0]}>
       {/* Base */}
       <mesh position={[0, 2, 0]}>
-        <boxGeometry args={[10, 4, 5]} /> {/* Adjusted size to be more typical for a mobile home */}
+        <boxGeometry args={[10, 4, 5]} />
         <meshStandardMaterial map={wallTexture} />
       </mesh>
 
       {/* Door */}
       <mesh position={[0, 1.5, 2.6]}>
-        <boxGeometry args={[3, 2.5, 0.1]} /> {/* Wider and lower door typical for mobile homes */}
+        <boxGeometry args={[3, 2.5, 0.1]} />
         <meshStandardMaterial map={doorTexture} />
       </mesh>
 
       {/* Windows */}
-      <WindowMobile position={[-3, 2, 2.6]} /> {/* Larger windows for mobile home */}
+      <WindowMobile position={[-3, 2, 2.6]} />
       <WindowMobile position={[3, 2, 2.6]} />
 
       {/* Roof */}
-      <mesh position={[0, 4, 0]} rotation={[0, 0, 0]}>
+      <mesh position={[0, 4, 0]}>
         <boxGeometry args={[10.15, 1, 5.95]} />
         <meshStandardMaterial map={useTexture("../assets/images/mobileroof.jpg")} />
       </mesh>
 
-      {/* Solar Grid */}
-      <MobileRoofGrid solarPanels={solarPanels} setSolarPanels={setSolarPanels} />
-
+      {/* Solar Grid - Only show when `showSolarPanels` is true */}
+      {showSolarPanels && <MobileRoofGrid solarPanels={solarPanels} setSolarPanels={setSolarPanels} />}
 
       {/* Wheels */}
-      {/* Front left wheel */}
       <mesh position={[-4, 0, 2.5]} rotation={[-Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[1, 1, 0.5, 32]} /> {/* Wheel geometry */}
+        <cylinderGeometry args={[1, 1, 0.5, 32]} />
         <meshStandardMaterial map={wheelTexture} />
       </mesh>
-
-      {/* Front right wheel */}
       <mesh position={[4, 0, 2.5]} rotation={[-Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[1, 1, 0.5, 32]} /> {/* Wheel geometry */}
+        <cylinderGeometry args={[1, 1, 0.5, 32]} />
         <meshStandardMaterial map={wheelTexture} />
       </mesh>
-
-      {/* Back left wheel */}
       <mesh position={[-4, 0, -2.5]} rotation={[-Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[1, 1, 0.5, 32]} /> {/* Wheel geometry */}
+        <cylinderGeometry args={[1, 1, 0.5, 32]} />
         <meshStandardMaterial map={wheelTexture} />
       </mesh>
-
-      {/* Back right wheel */}
       <mesh position={[4, 0, -2.5]} rotation={[-Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[1, 1, 0.5, 32]} /> {/* Wheel geometry */}
+        <cylinderGeometry args={[1, 1, 0.5, 32]} />
         <meshStandardMaterial map={wheelTexture} />
       </mesh>
     </group>

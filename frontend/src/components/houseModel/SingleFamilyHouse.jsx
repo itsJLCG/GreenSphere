@@ -3,7 +3,7 @@ import SolarPanel from "../renewableModel/SolarPanel.jsx";
 import React, { useState } from "react";
 
 // Flat Roof Grid with Solar Panels Toggle
-const FlatRoofGrid = ({ onSelect, solarPanels, setSolarPanels }) => {
+const FlatRoofGrid = ({ onSelect, solarPanels, setSolarPanels, showSolarPanels }) => {
     const gridSize = 3; // 3x3 grid
     const cellSize = 2; // Each cell is 2x2 in size
   
@@ -21,7 +21,7 @@ const FlatRoofGrid = ({ onSelect, solarPanels, setSolarPanels }) => {
   
     return (
       <group position={[0, 6.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        {Array.from({ length: gridSize }).map((_, row) =>
+        {showSolarPanels && Array.from({ length: gridSize }).map((_, row) =>
           Array.from({ length: gridSize }).map((_, col) => {
             const x = (col - 1) * cellSize; // Centering the grid
             const y = (row - 1) * cellSize;
@@ -55,7 +55,7 @@ const FlatRoofGrid = ({ onSelect, solarPanels, setSolarPanels }) => {
   };
 
 // Shed Roof Grid with Solar Panels Toggle
-const ShedRoofGrid = ({ onSelect, solarPanels, setSolarPanels }) => {
+const ShedRoofGrid = ({ onSelect, solarPanels, setSolarPanels, showSolarPanels }) => {
   const gridSize = 3; // 3x3 grid
   const cellSize = 2; // Each cell is 2x2 in size
 
@@ -73,7 +73,7 @@ const ShedRoofGrid = ({ onSelect, solarPanels, setSolarPanels }) => {
 
   return (
     <group position={[0, 6.01, 0]} rotation={[Math.PI / 20, 0, 0]}>
-      {Array.from({ length: gridSize }).map((_, row) =>
+      {showSolarPanels && Array.from({ length: gridSize }).map((_, row) =>
         Array.from({ length: gridSize }).map((_, col) => {
           const x = (col - 1) * cellSize; // Centering the grid
           const y = (row - 1) * cellSize;
@@ -106,7 +106,7 @@ const ShedRoofGrid = ({ onSelect, solarPanels, setSolarPanels }) => {
   );
 };
 
-const ButterflyRoofGrid = ({ solarPanels, setSolarPanels }) => {
+const ButterflyRoofGrid = ({ solarPanels, setSolarPanels, showSolarPanels }) => {
     const gridSize = 3; // 3x3 grid
     const cellSize = 2; // Each cell is 2x2 in size
 
@@ -122,7 +122,7 @@ const ButterflyRoofGrid = ({ solarPanels, setSolarPanels }) => {
     return (
         <group position={[-0.75, 5.3 + 0.1, 0]} rotation={[0, 4.75, 0]}>
             {/* Left Sloped Section */}
-            <group position={[0, 0.05, 1]} rotation={[Math.PI / 3, 0, 0]}>
+            {showSolarPanels && <group position={[0, 0.05, 1]} rotation={[Math.PI / 3, 0, 0]}>
                 {Array.from({ length: gridSize }).map((_, row) =>
                     Array.from({ length: gridSize }).map((_, col) => {
                         const x = (col - 1) * cellSize;
@@ -140,10 +140,10 @@ const ButterflyRoofGrid = ({ solarPanels, setSolarPanels }) => {
                         );
                     })
                 )}
-            </group>
+            </group>}
             
             {/* Right Sloped Section */}
-            <group position={[0, 0.05, -1]} rotation={[-Math.PI / 2.75, 0, 0]}>
+            {showSolarPanels && <group position={[0, 0.05, -1]} rotation={[-Math.PI / 2.75, 0, 0]}>
                 {Array.from({ length: gridSize }).map((_, row) =>
                     Array.from({ length: gridSize }).map((_, col) => {
                         const x = (col - 1) * cellSize;
@@ -161,12 +161,10 @@ const ButterflyRoofGrid = ({ solarPanels, setSolarPanels }) => {
                         );
                     })
                 )}
-            </group>
+            </group>}
         </group>
     );
 };
-
-
 
 // Roofs Component
 export const Roofs = {
@@ -179,7 +177,7 @@ export const Roofs = {
       </mesh>
     );
   },
-  Flat: () => {
+  Flat: ({ showSolarPanels }) => {
     const roofTexture = useTexture("../assets/images/roof.jpg");
     const [solarPanels, setSolarPanels] = useState([]);
 
@@ -194,11 +192,12 @@ export const Roofs = {
         <FlatRoofGrid
           solarPanels={solarPanels}
           setSolarPanels={setSolarPanels}
+          showSolarPanels={showSolarPanels}
         />
       </group>
     );
   },
-  Shed: () => {
+  Shed: ({ showSolarPanels }) => {
     const roofTexture = useTexture("../assets/images/roof.jpg");
     const [solarPanels, setSolarPanels] = useState([]);
 
@@ -213,11 +212,12 @@ export const Roofs = {
         <ShedRoofGrid
           solarPanels={solarPanels}
           setSolarPanels={setSolarPanels}
+          showSolarPanels={showSolarPanels}
         />
       </group>
     );
   },
-  Butterfly: () => {
+  Butterfly: ({ showSolarPanels }) => {
     const roofTexture = useTexture("../assets/images/roof.jpg");
     const [solarPanels, setSolarPanels] = useState([]);
     return (
@@ -230,12 +230,11 @@ export const Roofs = {
           <boxGeometry args={[5.85, 6.25]} />
           <meshStandardMaterial map={roofTexture} />
         </mesh>
-        <ButterflyRoofGrid solarPanels={solarPanels} setSolarPanels={setSolarPanels} />
+        <ButterflyRoofGrid solarPanels={solarPanels} setSolarPanels={setSolarPanels} showSolarPanels={showSolarPanels} />
       </group>
     );
   },
 };
-
 
 // Window Component
 export const Window = ({ position }) => {
@@ -249,7 +248,7 @@ export const Window = ({ position }) => {
 };
 
 // Single Family House Component
-const SingleFamilyHouse = ({ roofType }) => {
+const SingleFamilyHouse = ({ roofType, showSolarPanels }) => {
   const wallTexture = useTexture("../assets/images/wall.png");
   const doorTexture = useTexture("../assets/images/door.jpg");
 
@@ -269,7 +268,7 @@ const SingleFamilyHouse = ({ roofType }) => {
       <Window position={[-2.5, 3, 3.01]} />
       <Window position={[2.5, 3, 3.01]} />
       {/* Roof */}
-      {roofType && React.createElement(Roofs[roofType], { texturePath: "../assets/images/roof.jpg" })}
+      {roofType && React.createElement(Roofs[roofType], { texturePath: "../assets/images/roof.jpg", showSolarPanels })}
     </group>
   );
 };

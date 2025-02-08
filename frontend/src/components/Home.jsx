@@ -59,7 +59,12 @@ const Home = () => {
   const [isUnderwater, setIsUnderwater] = useState(false);
   const [isCyberpunk, setIsCyberpunk] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
+  const [showSolarPanels, setShowSolarPanels] = useState(false);
 
+  const handleSolarPanelToggle = (state) => {
+    setShowSolarPanels(state);
+  };
+  
   const toggleBackgroundColor = () => {
     if (isOuterSpace || isAncient || isUnderwater || isCyberpunk || isForest) {
       setIsOuterSpace(false); setIsAncient(false); setIsUnderwater(false); setIsCyberpunk(false); setIsForest(false);
@@ -172,14 +177,17 @@ const Home = () => {
         <Platform />
         {(selectedHouse || selectedBuilding) && (
           <Html position={[0, -3, 0]}>
-            <RenewableSlots />
+            <RenewableSlots 
+              infrastructure={selectedHouse || selectedBuilding} 
+              roofType={roofType} 
+              onSolarPanelClick={handleSolarPanelToggle} 
+            />
           </Html>
         )}
-        <Stats />
 
-        {/* Render Houses or Buildings */}
-        {selectedHouse && React.createElement(HouseModels[selectedHouse], { roofType })}
-        {selectedBuilding && React.createElement(BuildingModels[selectedBuilding])}
+        {/* Render Selected House or Building */}
+        {selectedHouse && React.createElement(HouseModels[selectedHouse], { roofType, showSolarPanels })}
+        {selectedBuilding && React.createElement(BuildingModels[selectedBuilding], { showSolarPanels })}
       </Canvas>
 
       {/* Day / Night Mode Button */}
