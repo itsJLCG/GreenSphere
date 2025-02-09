@@ -54,57 +54,53 @@ const FlatRoofGrid = ({ onSelect, solarPanels, setSolarPanels, showSolarPanels }
     );
   };
 
-// Shed Roof Grid with Solar Panels Toggle
-const ShedRoofGrid = ({ onSelect, solarPanels, setSolarPanels, showSolarPanels }) => {
-  const gridSize = 3; // 3x3 grid
-  const cellSize = 2; // Each cell is 2x2 in size
+  const ShedRoofGrid = ({ solarPanels, setSolarPanels, showSolarPanels }) => {
+    const gridSize = 3; // 3x3 grid
+    const cellSize = 2; // Each cell is 2x2
+    const roofAngle = Math.PI / 2.221; // Adjust based on your roof's slope
+    const roofHeight = 6.5; // Raised slightly to fit exactly on the roof
 
-  const handleClick = (row, col) => {
-    const cellKey = `${row}-${col}`;
-    // Toggle Solar Panel: Add if not there, remove if already placed
-    if (solarPanels.some(([r, c]) => r === row && c === col)) {
-      // If the panel is already there, remove it
-      setSolarPanels(solarPanels.filter(([r, c]) => r !== row || c !== col));
-    } else {
-      // Otherwise, add the panel
-      setSolarPanels([...solarPanels, [row, col]]);
-    }
-  };
+    const handleClick = (row, col) => {
+      const cellKey = `${row}-${col}`;
+      if (solarPanels.some(([r, c]) => r === row && c === col)) {
+        setSolarPanels(solarPanels.filter(([r, c]) => r !== row || c !== col));
+      } else {
+        setSolarPanels([...solarPanels, [row, col]]);
+      }
+    };
 
-  return (
-    <group position={[0, 6.01, 0]} rotation={[Math.PI / 20, 0, 0]}>
-      {showSolarPanels && Array.from({ length: gridSize }).map((_, row) =>
-        Array.from({ length: gridSize }).map((_, col) => {
-          const x = (col - 1) * cellSize; // Centering the grid
+    return (
+      <group position={[0, roofHeight, 0]} rotation={[-roofAngle, 0, 0]}>
+        {/* Clickable Grid for Solar Panels */}
+        {showSolarPanels &&
+          Array.from({ length: gridSize }).map((_, row) =>
+            Array.from({ length: gridSize }).map((_, col) => {
+              const x = (col - 1) * cellSize;
+              const y = (row - 1) * cellSize;
+              const isSelected = solarPanels.some(([r, c]) => r === row && c === col);
+
+              return (
+                <mesh
+                  key={`${row}-${col}`}
+                  position={[x, y, 0.01]}
+                  onClick={() => handleClick(row, col)}
+                >
+                  <planeGeometry args={[cellSize, cellSize]} />
+                  <meshStandardMaterial color={isSelected ? 'yellow' : 'green'} transparent opacity={isSelected ? 0 : 0.5} />
+                </mesh>
+              );
+            })
+          )}
+
+        {/* Render Solar Panels */}
+        {solarPanels.map(([row, col], index) => {
+          const x = (col - 1) * cellSize;
           const y = (row - 1) * cellSize;
-          const isSelected = solarPanels.some(([r, c]) => r === row && c === col);
-
-          return (
-            <mesh
-              key={`${row}-${col}`}
-              position={[x, y, 0]} // Positions grid cells flat on the roof
-              onClick={() => handleClick(row, col)}
-            >
-              <planeGeometry args={[cellSize, cellSize]} />
-              <meshStandardMaterial
-                color={isSelected ? "yellow" : "green"}
-                transparent={true}
-                opacity={isSelected ? 0 : 0.5} // Make grid transparent if panel placed
-              />
-            </mesh>
-          );
-        })
-      )}
-
-      {/* Render Solar Panels */}
-      {solarPanels.map(([row, col], index) => {
-        const x = (col - 1) * cellSize;
-        const y = (row - 1) * cellSize;
-        return <SolarPanel key={index} position={[x, y, 0]} />;
-      })}
-    </group>
-  );
-};
+          return <SolarPanel key={index} position={[x, y, 0.1]} />;
+        })}
+      </group>
+    );
+  };
 
 const ButterflyRoofGrid = ({ solarPanels, setSolarPanels, showSolarPanels }) => {
     const gridSize = 3; // 3x3 grid

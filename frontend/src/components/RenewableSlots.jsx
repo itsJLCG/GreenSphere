@@ -139,7 +139,7 @@ const RenewableSlots = ({ infrastructure, roofType, onSolarPanelClick }) => {
             className="slot"
             onMouseEnter={() => handleSlotHover(index)}
             onMouseLeave={handleSlotLeave}
-            onClick={slot.type === 'Solar Energy' ? handleSolarPanelClick : undefined}
+            onClick={slot.name === 'Solar Panels' ? handleSolarPanelClick : undefined}
           >
             <img src={slot.image} alt={slot.name} className="slot-image" />
             {hoveredSlot === index && (
